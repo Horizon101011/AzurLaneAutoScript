@@ -30,9 +30,14 @@ OCR_DOCK_SELECTED = DigitCounter(DOCK_SELECTED, threshold=64, name='OCR_DOCK_SEL
 
 class Dock(Equipment):
     def handle_dock_cards_loading(self):
-        # Poor implementation.
-        self.device.sleep((1, 1.5))
-        self.device.screenshot()
+        from module.retire.scanner import HashGenerator
+        scanner = HashGenerator()
+        old_result = None
+        new_result = scanner.scan(self.device.image)
+        while old_result != new_result:
+            old_result = new_result
+            self.device.screenshot()
+            new_result = scanner.scan(self.device.image)
 
     def dock_favourite_set(self, enable=False):
         if DOCK_FAVOURITE.set('on' if enable else 'off', main=self):
